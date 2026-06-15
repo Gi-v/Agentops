@@ -1,0 +1,22 @@
+# OpenClaw AgentOps Configuration (v2026)
+agent:
+  name: "SRE-Claw-1"
+  role: "Level 1 Site Reliability Engineer"
+  model: "default" # Uses the standard environment API key
+  
+  # How often the agent wakes up to proactively check systems
+  heartbeat_interval: 60s
+
+server:
+  port: 4000
+  gateway_url: "${BACKEND_URL}" # Points to your Go API (http://backend:8080)
+
+skills:
+  directory: "./skills"
+  enabled:
+    - "local-docker-manager"
+    - "slack-triage"
+
+memory:
+  type: "local_markdown"
+  file: "./MEMORY.md"

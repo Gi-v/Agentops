@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  # The Relational Database (Memory for the Agent)
+  postgres:
+    image: postgres:15-alpine
+    container_name: agent-db
+    environment:
+      POSTGRES_USER: agentops
+      POSTGRES_PASSWORD: password123
+      POSTGRES_DB: agentops_db
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - agent-net
+
+  # The Service Mesh & Registry
+  consul:
+    image: hashicorp/consul:latest
+    container_name: consul-server
+    command: "agent -dev -client=0.0.0.0"
+    ports:
+      - "8500:8500"
+    networks:
+      - agent-net
+
+  # The Go API Gateway
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: go-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - CONSUL_URL=http://consul:8500
+      - DATABASE_URL=postgres://agentops:password123@postgres:5432/agentops_db?sslmode=disable
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - consul
+      - postgres
+    restart: unless-stopped
+    networks:
+      - agent-net
+
+  # The Next.js Control Plane
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: agent-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - agent-net
+
+  # The OpenClaw AI Agent
+  openclaw:
+    build:
+      context: ./openclaw
+      dockerfile: Dockerfile
+    container_name: openclaw-agent
+    ports:
+      - "9091:9091"
+    volumes:
+      - ./openclaw:/app/workspace
+    environment:
+      - CLAW_API_KEY=${CLAW_API_KEY:-}
+      - BACKEND_URL=http://backend:8080
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+    depends_on:
+      - backend
+      - postgres
+    restart: on-failure
+    networks:
+      - agent-net
+
+networks:
+  agent-net:
+    driver: bridge
