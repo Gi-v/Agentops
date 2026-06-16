@@ -8,9 +8,8 @@ import (
 	"net/http"
 	"time"
 
-	// THE FIX: These must use the canonical "moby" paths to match the SDK
-	"github.com/moby/moby/api/types/container"
-	"github.com/moby/moby/client"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/client"
 
 	"github.com/Gi-v/agentops-platform/backend/db"
 )

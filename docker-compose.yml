@@ -27,7 +27,7 @@ services:
 
   # The Go API Gateway
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: go-backend
@@ -56,9 +56,6 @@ services:
       - "3000:3000"
     environment:
       - NEXT_PUBLIC_BACKEND_URL=http://localhost:8080
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     depends_on:
       - backend
     restart: unless-stopped
@@ -76,9 +73,9 @@ services:
     volumes:
       - ./openclaw:/app/workspace
     environment:
-      - CLAW_API_KEY=${CLAW_API_KEY:-}
+      - CLAW_API_KEY=\${CLAW_API_KEY:-}
       - BACKEND_URL=http://backend:8080
-      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+      - SLACK_WEBHOOK_URL=\${SLACK_WEBHOOK_URL:-}
     depends_on:
       - backend
       - postgres
