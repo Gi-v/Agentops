@@ -68,7 +68,7 @@ func main() {
 	go func() {
 		<-quit
 		slog.Info("Termination signal intercepted. Initiating graceful shutdown sequence...")
-		cancel() // This cascades the termination signal to all active network requests
+		cancel() // Cascades termination to active requests
 	}()
 
 	// --- 2. METRICS EXPORT PIPELINE ---
@@ -95,7 +95,6 @@ func main() {
 			slog.Info("Agent loop successfully terminated without resource leaks.")
 			return
 		default:
-			// Execute polling cycle
 			req, err := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/v1/health/state/any", consulURL), nil)
 			if err != nil {
 				continue
@@ -103,9 +102,8 @@ func main() {
 
 			resp, err := http.DefaultClient.Do(req)
 			if err != nil {
-				consulPollErrors.Inc() // Track failure in Prometheus
+				consulPollErrors.Inc()
 				
-				// Calculate Jittered Backoff (prevents thundering herd problems)
 				jitter := time.Duration(rand.Int63n(int64(currentDelay) / 2))
 				actualDelay := currentDelay + jitter
 				
@@ -117,7 +115,6 @@ func main() {
 					return
 				}
 
-				// Exponential multiplier up to max cap
 				currentDelay *= 2
 				if currentDelay > maxDelay {
 					currentDelay = maxDelay
@@ -125,7 +122,6 @@ func main() {
 				continue
 			}
 
-			// Reset backoff delay on successful mesh connection
 			currentDelay = baseDelay
 
 			var checks []ConsulCheck
@@ -151,4 +147,28 @@ func main() {
 
 					payload := map[string]string{
 						"service_name": check.ServiceName,
-						"issue":        fmt.Sprintf("Consul
+						"issue":        fmt.Sprintf("Consul check reporting failure: %s", check.Output),
+						"action":       "evaluate_remediation_heuristics",
+					}
+					jsonPayload, _ := json.Marshal(payload)
+
+					postReq, _ := http.NewRequestWithContext(ctx, "POST", fmt.Sprintf("%s/api/remediate", backendURL), bytes.NewBuffer(jsonPayload))
+					postReq.Header.Set("Content-Type", "application/json")
+					
+					_, postErr := http.DefaultClient.Do(postReq)
+					if postErr != nil {
+						slog.Error("Logic kernel handover failed", "error", postErr)
+					} else {
+						remediationsTriggered.Inc()
+					}
+				}
+			}
+			
+			select {
+			case <-time.After(4 * time.Second):
+			case <-ctx.Done():
+				return
+			}
+		}
+	}
+}

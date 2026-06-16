@@ -9,7 +9,9 @@ import (
 	"os/signal"
 	"syscall"
 	"time"
-
+	
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 	"github.com/Gi-v/agentops-platform/backend/consul"
 	"github.com/Gi-v/agentops-platform/backend/db"
 	"github.com/Gi-v/agentops-platform/backend/handlers"

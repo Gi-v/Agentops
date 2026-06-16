@@ -8,8 +8,9 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
+	// THE FIX: These must use the canonical "moby" paths to match the SDK
+	"github.com/moby/moby/api/types/container"
+	"github.com/moby/moby/client"
 
 	"github.com/Gi-v/agentops-platform/backend/db"
 )
@@ -20,15 +21,12 @@ type RemediationRequest struct {
 	Action      string `json:"action"`
 }
 
-type Incident struct {
-	ID          int       `json:"id"`
-	ServiceName string    `json:"service_name"`
-	Description string    `json:"issue_description"`
-	Action      string    `json:"action_taken"`
-	Status      string    `json:"status"`
-	CreatedAt   time.Time `json:"created_at"`
+type SlackPayload struct {
+	ServiceName string `json:"service_name"`
+	Action      string `json:"action"`
 }
 
+// restartDockerContainer connects to the local Docker socket and issues a restart command
 func restartDockerContainer(containerName string) error {
 	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
@@ -42,6 +40,7 @@ func restartDockerContainer(containerName string) error {
 	return cli.ContainerRestart(ctx, containerName, container.StopOptions{})
 }
 
+// HandleRemediation receives automated webhook triggers from the OpenClaw Agent
 func HandleRemediation(w http.ResponseWriter, r *http.Request) {
 	var req RemediationRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -50,98 +49,42 @@ func HandleRemediation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slog.Info(
-		"Evaluating autonomous rule execution",
-		"service_name", req.ServiceName,
-		"action", req.Action,
-	)
-
+	slog.Info("Evaluating autonomous rule execution", "service_name", req.ServiceName, "action", req.Action)
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte(`{"status": "processing"}`))
 }
 
+// HandleSlackInteraction processes approvals from remote human operators
 func HandleSlackInteraction(w http.ResponseWriter, r *http.Request) {
-	if err := r.ParseForm(); err != nil {
-		http.Error(w, "Failed to decode form response context", http.StatusBadRequest)
+	var actionData SlackPayload
+	if err := json.NewDecoder(r.Body).Decode(&actionData); err != nil {
+		http.Error(w, `{"error": "Invalid payload"}`, http.StatusBadRequest)
 		return
 	}
 
-	var payload struct {
-		Actions []struct {
-			Value string `json:"value"`
-		} `json:"actions"`
-	}
-
-	if err := json.Unmarshal([]byte(r.FormValue("payload")), &payload); err != nil || len(payload.Actions) == 0 {
-		http.Error(w, "Invalid interactive state data structure", http.StatusBadRequest)
-		return
-	}
-
-	var actionData struct {
-		ServiceName string `json:"service_name"`
-		Action      string `json:"action"`
-	}
-
-	json.Unmarshal([]byte(payload.Actions[0].Value), &actionData)
-
-	slog.Info(
-		"Operator Authorization confirmed via Slack",
-		"service_name", actionData.ServiceName,
-	)
+	slog.Info("Operator Authorization confirmed via Slack", "service_name", actionData.ServiceName)
 
 	if actionData.Action == "restart" {
 		err := restartDockerContainer(actionData.ServiceName)
-
 		statusValue := "Resolved"
 		descValue := "Critical mesh health check failed. System state brought back to equilibrium through operator validation."
-
+		
 		if err != nil {
-			slog.Warn(
-				"Docker engine execution warning",
-				"service_name", actionData.ServiceName,
-				"error", err,
-			)
-
+			slog.Warn("Docker engine execution warning", "service_name", actionData.ServiceName, "error", err)
 			descValue = fmt.Sprintf("Remediation execution flagged an adjustment: %v", err)
 			statusValue = "Executed"
 		}
 
+		// Ensure db.Conn is initialized in your db package
 		_, dbErr := db.Conn.Exec(
 			"INSERT INTO incidents (service_name, issue_description, action_taken, status) VALUES ($1, $2, $3, $4)",
-			actionData.ServiceName,
-			descValue,
-			"Container Restart Matrix Triggered",
-			statusValue,
+			actionData.ServiceName, descValue, "Container Restart Matrix Triggered", statusValue,
 		)
-
 		if dbErr != nil {
-			slog.Error(
-				"Persistent storage write failure",
-				"error", dbErr,
-			)
+			slog.Error("Persistent storage write failure", "error", dbErr)
 		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.Write([]byte(`{"text": "✅ Command payload deployed into execution context. Check your Dashboard ledger."}`))
-}
-
-func HandleGetIncidents(w http.ResponseWriter, r *http.Request) {
-	rows, err := db.Conn.Query("SELECT id, service_name, issue_description, action_taken, status, created_at FROM incidents ORDER BY created_at DESC LIMIT 10")
-	if err != nil {
-		http.Error(w, `{"error": "Database retrieval exception"}`, http.StatusInternalServerError)
-		return
-	}
-	defer rows.Close()
-
-	incidents := []Incident{}
-	for rows.Next() {
-		var i Incident
-		if err := rows.Scan(&i.ID, &i.ServiceName, &i.Description, &i.Action, &i.Status, &i.CreatedAt); err != nil {
-			continue
-		}
-		incidents = append(incidents, i)
-	}
-
-	json.NewEncoder(w).Encode(incidents)
 }
