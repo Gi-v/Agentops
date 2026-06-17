@@ -1,9 +1,8 @@
-// @ts-ignore
 import "./globals.css";
 
 export const metadata = {
-  title: "OpenClaw AgentOps | Control Plane",
-  description: "Autonomous IDP Management",
+  title: "Aegis Mesh | Control Plane",
+  description: "Autonomous SRE Fleet Orchestration",
 };
 
 export default function RootLayout({
@@ -13,7 +12,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased bg-background text-gray-100 min-h-screen">
+      {/* Mellow Theme Foundation:
+        We use a softer text-slate-200 and a baseline background of slate-900
+        to prevent eye strain during long monitoring sessions.
+      */}
+      <body className="antialiased bg-slate-900 text-slate-200 min-h-screen selection:bg-blue-500/30">
         {children}
       </body>
     </html>
