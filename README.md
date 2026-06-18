@@ -6,14 +6,29 @@
   <img src="https://skillicons.dev/icons?i=docker,go,nextjs,postgres,prometheus,githubactions&theme=dark" alt="Tech Stack" />
 </a>
 
-<p align="center">
-  <img
-    src="https://gist.githubusercontent.com/USERNAME/GIST_ID/raw/aegis-mesh.svg"
-    width="220"
-    alt="Aegis Mesh Logo"
-  />
-</p>
+<br><br>
 
+<img
+  width="100%"
+  src="https://capsule-render.vercel.app/api?type=waving&height=250&color=0:4c1d95,50:3b82f6,100:14b8a6&text=Aegis%20Mesh&fontColor=ffffff&fontSize=60&fontAlignY=40&desc=Autonomous%20Fleet%20Orchestration%20•%20Self-Healing%20Service%20Mesh&descAlignY=65"
+/>
+
+<br>
+
+<a href="#">
+  <img src="https://readme-typing-svg.demolab.com?font=Josefin+Sans&weight=600&size=22&pause=2000&color=3B82F6&center=true&vCenter=true&width=800&lines=Autonomous+Fleet+Orchestration;Self-Healing+Service+Mesh;AI-Driven+Root+Cause+Analysis;Real-Time+WebSocket+Telemetry;Cryptographic+SRE+Auditing" alt="Typing SVG" />
+</a>
+
+<br><br>
+
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](#)
+[![Version](https://img.shields.io/badge/version-v6.1.0_enterprise-blue?style=for-the-badge)](#)
+[![Go Report](https://img.shields.io/badge/go_report-A+-success?style=for-the-badge&logo=go&logoColor=white)](#)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
+
+</div>
+
+> An event-driven SRE daemon that monitors microservices, autonomously diagnoses root causes using AI heuristics, and executes zero-touch remediation before human intervention is required.
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](#)
 [![Version](https://img.shields.io/badge/version-v6.1.0_enterprise-blue?style=for-the-badge)](#)
 [![Go Report](https://img.shields.io/badge/go_report-A+-success?style=for-the-badge&logo=go&logoColor=white)](#)
