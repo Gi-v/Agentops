@@ -6,62 +6,13 @@
   <img src="https://skillicons.dev/icons?i=docker,go,nextjs,postgres,prometheus,githubactions&theme=dark" alt="Tech Stack" />
 </a>
 
-<br><br>
-
-<
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="200" height="200">
-  <defs>
-    <linearGradient id="aegisGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#4c1d95" />
-      <stop offset="50%" stop-color="#3b82f6" />
-      <stop offset="100%" stop-color="#14b8a6" />
-    </linearGradient>
-    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="5" result="blur" />
-      <feComposite in="SourceGraphic" in2="blur" operator="over" />
-    </filter>
-  </defs>
-
-  <!-- Main Shield Base -->
-  <path d="M 128 24 L 216 56 L 216 136 C 216 190 140 230 128 240 C 116 230 40 190 40 136 L 40 56 Z"
-        fill="none" stroke="url(#aegisGrad)" stroke-width="8" />
-
-  <!-- Inner Mesh Lines -->
-  <g stroke="#3b82f6" stroke-width="2.5" opacity="0.6">
-    <line x1="128" y1="24" x2="128" y2="100" />
-    <line x1="40" y1="56" x2="128" y2="100" />
-    <line x1="216" y1="56" x2="128" y2="100" />
-    <line x1="40" y1="136" x2="128" y2="100" />
-    <line x1="216" y1="136" x2="128" y2="100" />
-    <line x1="128" y1="240" x2="128" y2="170" />
-    <line x1="40" y1="136" x2="128" y2="170" />
-    <line x1="216" y1="136" x2="128" y2="170" />
-    <line x1="128" y1="100" x2="128" y2="170" />
-  </g>
-
-  <!-- Perimeter Mesh Nodes -->
-  <g fill="#14b8a6" filter="url(#glow)">
-    <circle cx="128" cy="24" r="5" />
-    <circle cx="216" cy="56" r="5" />
-    <circle cx="40" cy="56" r="5" />
-    <circle cx="216" cy="136" r="5" />
-    <circle cx="40" cy="136" r="5" />
-    <circle cx="128" cy="240" r="5" />
-  </g>
-
-  <!-- Autonomous AI Core Node -->
-  <circle cx="128" cy="100" r="12" fill="#a855f7" filter="url(#glow)" />
-  
-  <!-- Secondary Telemetry Node -->
-  <circle cx="128" cy="170" r="8" fill="#3b82f6" filter="url(#glow)" />
-</svg>
-
-
-<a href="#">
-  <img src="https://readme-typing-svg.demolab.com?font=Josefin+Sans&weight=600&size=22&pause=2000&color=3B82F6&center=true&vCenter=true&width=800&lines=Autonomous+Fleet+Orchestration;Self-Healing+Service+Mesh;AI-Driven+Root+Cause+Analysis;Real-Time+WebSocket+Telemetry;Cryptographic+SRE+Auditing" alt="Typing SVG" />
-</a>
-
-<br>
+<p align="center">
+  <img
+    src="https://gist.githubusercontent.com/USERNAME/GIST_ID/raw/aegis-mesh.svg"
+    width="220"
+    alt="Aegis Mesh Logo"
+  />
+</p>
 
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen?style=for-the-badge&logo=githubactions&logoColor=white)](#)
 [![Version](https://img.shields.io/badge/version-v6.1.0_enterprise-blue?style=for-the-badge)](#)
